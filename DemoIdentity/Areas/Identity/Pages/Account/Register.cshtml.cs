@@ -75,8 +75,8 @@ namespace DemoIdentity.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-                    await _roleManager.CreateAsync(new IdentityRole("Admin"));
-                    await _userManager.AddToRoleAsync(user, "Admin");
+                    //await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                    //await _userManager.AddToRoleAsync(user, "Admin");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Page(
