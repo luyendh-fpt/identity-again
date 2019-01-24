@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Mail;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace DemoIdentity.Areas.Identity.Pages.Account
 {
@@ -85,8 +87,10 @@ namespace DemoIdentity.Areas.Identity.Pages.Account
                         values: new { userId = user.Id, code = code },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                    SendMail(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                    //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(returnUrl);
@@ -100,5 +104,29 @@ namespace DemoIdentity.Areas.Identity.Pages.Account
             // If we got this far, something failed, redisplay form
             return Page();
         }
+
+        private void SendMail(string receiveMail, string receiveName, string mailContent)
+        {
+            SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
+            client.EnableSsl = true;
+            MailAddress from = new MailAddress("32@gmail.com", "My Admin");
+            MailAddress to = new MailAddress(receiveMail, receiveName);
+            MailMessage message = new MailMessage(from, to);
+            message.Body = mailContent;
+            message.Subject = "Gmail test email with SSL and Credentials";
+            NetworkCredential myCreds = new NetworkCredential("12.32@gmail.com", "23", "");
+            client.Credentials = myCreds;
+            try
+            {
+                client.Send(message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception is:" + ex.ToString());
+            }
+            Console.WriteLine("Goodbye.");
+        }
     }
+
+
 }
